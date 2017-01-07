@@ -296,10 +296,9 @@ describe('SerialPort', () => {
           stopBits: 1
         };
         const port = new SerialPort('/dev/exists', { autoOpen: false });
-        sandbox.stub(port.binding, 'open', (path, opt, cb) => {
+        sandbox.stub(port.binding, 'open', (path, opt) => {
           assert.equal(path, '/dev/exists');
           assert.containSubset(opt, defaultOptions);
-          assert.isFunction(cb);
           done();
         });
         port.open();
@@ -345,15 +344,14 @@ describe('SerialPort', () => {
         });
         port.open((err) => {
           assert.instanceOf(err, Error);
-          assert.strictEqual(err.message, 'Port is opening');
           done();
         });
       });
 
       it('allows opening after an open error', (done) => {
         const port = new SerialPort('/dev/exists', { autoOpen: false });
-        const stub = sandbox.stub(port.binding, 'open', (path, opt, cb) => {
-          cb(new Error('Haha no'));
+        const stub = sandbox.stub(port.binding, 'open', () => {
+          return Promise.reject(new Error('Haha no'));
         });
         port.open((err) => {
           assert.instanceOf(err, Error);
@@ -503,8 +501,8 @@ describe('SerialPort', () => {
 
       it('handles errors in callback', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'close', (cb) => {
-          cb(new Error('like tears in the rain'));
+        sinon.stub(port.binding, 'close', () => {
+          return Promise.reject(new Error('like tears in the rain'));
         });
         port.on('open', () => {
           port.close((err) => {
@@ -516,8 +514,8 @@ describe('SerialPort', () => {
 
       it('handles errors in event', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'close', (cb) => {
-          cb(new Error('attack ships on fire off the shoulder of Orion'));
+        sinon.stub(port.binding, 'close', () => {
+          return Promise.reject(new Error('attack ships on fire off the shoulder of Orion'));
         });
         port.on('open', () => {
           port.close();
@@ -571,8 +569,8 @@ describe('SerialPort', () => {
 
       it('handles errors in callback', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'update', (settings, cb) => {
-          cb(new Error('like tears in the rain'));
+        sinon.stub(port.binding, 'update', () => {
+          return Promise.reject(new Error('like tears in the rain'));
         });
         port.on('open', () => {
           port.update({}, (err) => {
@@ -584,8 +582,8 @@ describe('SerialPort', () => {
 
       it('handles errors in event', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'update', (settings, cb) => {
-          cb(new Error('attack ships on fire off the shoulder of Orion'));
+        sinon.stub(port.binding, 'update', () => {
+          return Promise.reject(new Error('attack ships on fire off the shoulder of Orion'));
         });
         port.on('open', () => {
           port.update({});
@@ -681,8 +679,8 @@ describe('SerialPort', () => {
 
       it('handles errors in callback', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'set', (settings, cb) => {
-          cb(new Error('like tears in the rain'));
+        sinon.stub(port.binding, 'set', () => {
+          return Promise.reject(new Error('like tears in the rain'));
         });
         port.on('open', () => {
           port.set({}, (err) => {
@@ -694,8 +692,8 @@ describe('SerialPort', () => {
 
       it('handles errors in event', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'set', (settings, cb) => {
-          cb(new Error('attack ships on fire off the shoulder of Orion'));
+        sinon.stub(port.binding, 'set', () => {
+          return Promise.reject(new Error('attack ships on fire off the shoulder of Orion'));
         });
         port.on('open', () => {
           port.set({});
@@ -730,8 +728,8 @@ describe('SerialPort', () => {
 
       it('handles errors in callback', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'flush', (cb) => {
-          cb(new Error('like tears in the rain'));
+        sinon.stub(port.binding, 'flush', () => {
+          return Promise.reject(new Error('like tears in the rain'));
         });
         port.on('open', () => {
           port.flush((err) => {
@@ -743,8 +741,8 @@ describe('SerialPort', () => {
 
       it('handles errors in event', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'flush', (cb) => {
-          cb(new Error('attack ships on fire off the shoulder of Orion'));
+        sinon.stub(port.binding, 'flush', () => {
+          return Promise.reject(new Error('attack ships on fire off the shoulder of Orion'));
         });
         port.on('open', () => {
           port.flush();
@@ -779,8 +777,8 @@ describe('SerialPort', () => {
 
       it('handles errors in callback', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'drain', (cb) => {
-          cb(new Error('like tears in the rain'));
+        sinon.stub(port.binding, 'drain', () => {
+          return Promise.reject(new Error('like tears in the rain'));
         });
         port.on('open', () => {
           port.drain((err) => {
@@ -792,8 +790,8 @@ describe('SerialPort', () => {
 
       it('handles errors in event', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'drain', (cb) => {
-          cb(new Error('attack ships on fire off the shoulder of Orion'));
+        sinon.stub(port.binding, 'drain', () => {
+          return Promise.reject(new Error('attack ships on fire off the shoulder of Orion'));
         });
         port.on('open', () => {
           port.drain();
@@ -832,8 +830,8 @@ describe('SerialPort', () => {
 
       it('handles errors in callback', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'get', (cb) => {
-          cb(new Error('like tears in the rain'));
+        sinon.stub(port.binding, 'get', () => {
+          return Promise.reject(new Error('like tears in the rain'));
         });
         port.on('open', () => {
           port.get((err) => {
@@ -845,8 +843,8 @@ describe('SerialPort', () => {
 
       it('handles errors in event', (done) => {
         const port = new SerialPort('/dev/exists');
-        sinon.stub(port.binding, 'get', (cb) => {
-          cb(new Error('attack ships on fire off the shoulder of Orion'));
+        sinon.stub(port.binding, 'get', () => {
+          return Promise.reject(new Error('attack ships on fire off the shoulder of Orion'));
         });
         port.on('open', () => {
           port.get();
